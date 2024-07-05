@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+
+'''
+This is a program where you input a text file consisting of lines of characters.
+. -> this character means the starting points.
+x -> this character means targets.
+[space] -> space means empty cells we can travel to
+Any other character means obstacle.
+The program will read in such file and draw the shortest paths from starting
+points to targets. The shortest paths will be drawn with @ character.
+'''
+
+import sys
+from collections import deque
+from collections import namedtuple
+
+STARTING_CHAR = '.'
+TARGET_CHAR = 'x'
+PATH_CHAR = '|'
+
+Point = namedtuple('point', ['row', 'col'])
+
+
+class World:
+    def __init__(self) -> None:
+        self.field = []
+        self.starting_points = []
+        self.paths = []
+        self.prevs = {}
+        self.can_to = set([STARTING_CHAR, TARGET_CHAR, ' '])
+
+    def add_row(self, row):
+        self.field.append(row)
+
+    def change_tabs_to_spaces(self):
+        num_rows = len(self.field)
+        for r in range(num_rows):
+            self.field[r] = self.field[r].replace('\t', '    ')
+
+    def can_go_up(self, point: Point):
+        row = point.row
+        col = point.col
+        new_point = Point(row-1, col)
+        if new_point.row < 0:
+            return (False, None)
+        destination_char = self.field[new_point.row][new_point.col]
+        if destination_char not in self.can_to:
+            return (False, None)
+        return (True, new_point)
+
+    def can_go_right(self, point: Point):
+        row = point.row
+        col = point.col
+        new_point = Point(row, col+1)
+        current_line = self.field[row]
+        line_len = len(current_line)
+        if new_point.col >= line_len:
+            return (False, None)
+        destination_char = self.field[new_point.row][new_point.col]
+        if destination_char not in self.can_to:
+            return (False, None)
+        return (True, new_point)
+
+    def can_go_down(self, point: Point):
+        row = point.row
+        col = point.col
+        new_point = Point(row+1, col)
+        num_rows = len(self.field)
+        if new_point.row >= num_rows:
+            return (False, None)
+        destination_char = self.field[new_point.row][new_point.col]
+        if destination_char not in self.can_to:
+            return (False, None)
+        return (True, new_point)
+
+    def can_go_left(self, point: Point):
+        row = point.row
+        col = point.col
+        new_point = Point(row, col-1)
+        if new_point.col < 0:
+            return (False, None)
+        destination_char = self.field[new_point.row][new_point.col]
+        if destination_char not in self.can_to:
+            return (False, None)
+        return (True, new_point)
+
+    def find_starts(self):
+        num_rows = len(self.field)
+        for i in range(num_rows):
+            row_len = len(self.field[i])
+            for j in range(row_len):
+                if self.field[i][j] == STARTING_CHAR:
+                    self.starting_points.append(Point(i, j))
+
+    def add_path(self, src: Point, dst: Point):
+        new_path = []
+        curr_point = dst
+        while curr_point != src:
+            new_path.append(curr_point)
+            curr_point = self.prevs[curr_point]
+        del new_path[0]
+        self.paths.append(new_path)
+
+    def readin(self, file):
+        self.field = list(map(lambda line: line[:-1], file.readlines()))
+
+    def run(self):
+        self.change_tabs_to_spaces()
+        self.find_starts()
+        while self.starting_points:
+            start = self.starting_points.pop()
+            self.prevs.clear()
+            visited = set([start])
+            queue = deque([start])
+            while queue:
+                node = queue.popleft()
+                current_char = self.field[node.row][node.col]
+                if current_char == TARGET_CHAR:
+                    self.add_path(start, node)
+
+                result, new_point = self.can_go_up(node)
+                if result and new_point not in visited:
+                    self.prevs[new_point] = node
+                    visited.add(new_point)
+                    queue.append(new_point)
+
+                result, new_point = self.can_go_right(node)
+                if result and new_point not in visited:
+                    self.prevs[new_point] = node
+                    visited.add(new_point)
+                    queue.append(new_point)
+
+                result, new_point = self.can_go_down(node)
+                if result and new_point not in visited:
+                    self.prevs[new_point] = node
+                    visited.add(new_point)
+                    queue.append(new_point)
+
+                result, new_point = self.can_go_left(node)
+                if result and new_point not in visited:
+                    self.prevs[new_point] = node
+                    visited.add(new_point)
+                    queue.append(new_point)
+
+    def __str__(self) -> str:
+        self.run()
+        lines = list(map(lambda l: list(l), self.field))
+        for path in self.paths:
+            for point in path:
+                lines[point.row][point.col] = PATH_CHAR
+        return '\n'.join(list(map(lambda line: ''.join(line), lines)))
+
+
+file_path = sys.argv[1]
+the_file = open(file_path, 'r')
+world = World()
+world.readin(the_file)
+the_file.close()
+print(world)
