@@ -44,7 +44,7 @@ class World:
                 longest_line_len = line_len
         for i in range(len(self.field)):
             diff_len = longest_line_len - len(self.field[i])
-            if diff_len>0:
+            if diff_len > 0:
                 self.field[i] += ' '*diff_len
 
     def change_tabs_to_spaces(self):
