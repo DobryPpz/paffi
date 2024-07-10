@@ -2,12 +2,12 @@
 
 '''
 This is a program where you input a text file consisting of lines of characters.
-. -> this character means the starting points.
-x -> this character means targets.
-[space] -> space means empty cells we can travel to
+. -> this character means the starting points(default).
+x -> this character means targets(default).
+[:space:] -> space means empty cells we can travel to
 Any other character means obstacle.
 The program will read in such file and draw the shortest paths from starting
-points to targets. The shortest paths will be drawn with @ character.
+points to targets. The shortest paths will be drawn with @ character(default).
 '''
 
 import sys
@@ -16,7 +16,7 @@ from collections import namedtuple
 
 STARTING_CHAR = '.'
 TARGET_CHAR = 'x'
-PATH_CHAR = '|'
+PATH_CHAR = '@'
 
 Point = namedtuple('point', ['row', 'col'])
 
@@ -29,13 +29,29 @@ class World:
         self.prevs = {}
         self.can_to = set([STARTING_CHAR, TARGET_CHAR, ' '])
 
-    def add_row(self, row):
-        self.field.append(row)
+    def add_row(self, row: str):
+        row = row.strip('\n')
+        if row != '':
+            self.field.append(row)
+        else:
+            self.field.append(' ')
+
+    def do_padding(self):
+        longest_line_len = 1
+        for row in self.field:
+            line_len = len(row)
+            if line_len > longest_line_len:
+                longest_line_len = line_len
+        for i in range(len(self.field)):
+            diff_len = longest_line_len - len(self.field[i])
+            if diff_len>0:
+                self.field[i] += ' '*diff_len
 
     def change_tabs_to_spaces(self):
         num_rows = len(self.field)
         for r in range(num_rows):
-            self.field[r] = self.field[r].replace('\t', '    ')
+            if '\t' in self.field[r]:
+                self.field[r] = self.field[r].replace('\t', '    ')
 
     def can_go_up(self, point: Point):
         row = point.row
@@ -102,7 +118,9 @@ class World:
         self.paths.append(new_path)
 
     def readin(self, file):
-        self.field = list(map(lambda line: line[:-1], file.readlines()))
+        for line in file.readlines():
+            self.add_row(line)
+        self.do_padding()
 
     def run(self):
         self.change_tabs_to_spaces()
