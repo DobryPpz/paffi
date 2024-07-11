@@ -27,6 +27,7 @@ You can specify the following options:
 -s:<c>  ->  the starting point character will be <c>
 -t:<c>  ->  the target character will be <c>
 -p:<c>  ->  the paths will be drawn with <c> character
+-n:<c>  ->  the neighbourhood: 4 for Von Neumann(default), 8 for Moore
 '''
 
 import sys
@@ -35,12 +36,14 @@ from collections import deque, namedtuple
 STARTING_CHAR = '.'
 TARGET_CHAR = 'x'
 PATH_CHAR = '@'
+EXTENDED_NEIGHBOURHOOD = False
 
 
 def parse_options(options_list):
     global STARTING_CHAR
     global TARGET_CHAR
     global PATH_CHAR
+    global EXTENDED_NEIGHBOURHOOD
     option_set = set(['-s', '-t', '-p'])
     for option in options_list:
         if len(option) != 4:
@@ -94,7 +97,7 @@ def go_up_left(point: Point):
 
 
 class World:
-    def __init__(self, extended_neighbourhood=False) -> None:
+    def __init__(self, extended_neighbourhood) -> None:
         self.field = []
         self.starting_points = []
         self.paths = []
@@ -218,7 +221,7 @@ options_part = sys.argv[1:-1]
 if options_part:
     parse_options(options_part)
 
-world = World()
+world = World(EXTENDED_NEIGHBOURHOOD)
 world.readin(the_file)
 the_file.close()
 print(world)
