@@ -23,6 +23,10 @@ x -> this character means targets(default).
 Any other character means obstacle.
 The program will read in such file and draw the shortest paths from starting
 points to targets. The shortest paths will be drawn with @ character(default).
+You can specify the following options:
+-s:<c>  ->  the starting point character will be <c>
+-t:<c>  ->  the target character will be <c>
+-p:<c>  ->  the paths will be drawn with <c> character
 '''
 
 import sys
@@ -34,6 +38,26 @@ PATH_CHAR = '@'
 
 Point = namedtuple('point', ['row', 'col'])
 
+
+def parse_options(options_list):
+    global STARTING_CHAR
+    global TARGET_CHAR
+    global PATH_CHAR
+    option_set = set(['-s', '-t', '-p'])
+    for option in options_list:
+        if len(option) != 4:
+            print(f'"{option}"  Wrong option format',file=sys.stderr)
+            exit(-1)
+        option_type, option_value = option[:2], option[3:]
+        if option_type not in option_set:
+            print(f'"{option_type}"  no such option available', file=sys.stderr)
+            exit(-1)
+        if option_type=='-s':
+            STARTING_CHAR = option_value
+        elif option_type=='-t':
+            TARGET_CHAR = option_value
+        elif option_type=='-p':
+            PATH_CHAR = option_value
 
 class World:
     def __init__(self) -> None:
@@ -194,6 +218,10 @@ try:
 except OSError:
     print('Could not open the file', file=sys.stderr)
     exit(-1)
+
+options_part = sys.argv[1:-1]
+if options_part:
+    parse_options(options_part)
 
 world = World()
 world.readin(the_file)
