@@ -187,7 +187,7 @@ if len(sys.argv) < 2:
     print('Not enough arguments to paffi', file=sys.stderr)
     exit(-1)
 
-file_path = sys.argv[1]
+file_path = sys.argv[-1]
 
 try:
     the_file = open(file_path, 'r')
