@@ -46,18 +46,19 @@ def parse_options(options_list):
     option_set = set(['-s', '-t', '-p'])
     for option in options_list:
         if len(option) != 4:
-            print(f'"{option}"  Wrong option format',file=sys.stderr)
+            print(f'"{option}"  Wrong option format', file=sys.stderr)
             exit(-1)
         option_type, option_value = option[:2], option[3:]
         if option_type not in option_set:
             print(f'"{option_type}"  no such option available', file=sys.stderr)
             exit(-1)
-        if option_type=='-s':
+        if option_type == '-s':
             STARTING_CHAR = option_value
-        elif option_type=='-t':
+        elif option_type == '-t':
             TARGET_CHAR = option_value
-        elif option_type=='-p':
+        elif option_type == '-p':
             PATH_CHAR = option_value
+
 
 class World:
     def __init__(self) -> None:
