@@ -1,6 +1,5 @@
 - Add the export feature, where the paths, and only the paths will be printed into some results file.
 - Add the export feature, where both the original file content and the paths will be printed into some results file.
-- Add the option to specify neighbourhood type, where it's either Moore or Von Neumann.
 - Paths are highlighted in some way, for example by some color.
 - Instead of a path character, the user can specify a string, where the path will be composed of that string's content.
 - Provide the possibility to merge several files into one, so that the path search can be performed on such merged file.
@@ -9,3 +8,4 @@
 - Add some minimization features, for example a feature where paffi returns the minimum number of characters that need to be deleted from the original file so that the resulting path is shortest possible.
 - Add the option to specify the maximum path length that paffi can consider.
 - Add a shifter feature: for some path present for some file paffi can shift the whole file in such a way that the path is straightened.
+- Use argparse.
