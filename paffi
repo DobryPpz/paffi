@@ -183,8 +183,18 @@ class World:
         return '\n'.join(list(map(lambda line: ''.join(line), lines)))
 
 
+if len(sys.argv) < 2:
+    print('Not enough arguments to paffi', file=sys.stderr)
+    exit(-1)
+
 file_path = sys.argv[1]
-the_file = open(file_path, 'r')
+
+try:
+    the_file = open(file_path, 'r')
+except OSError:
+    print('Could not open the file', file=sys.stderr)
+    exit(-1)
+
 world = World()
 world.readin(the_file)
 the_file.close()
