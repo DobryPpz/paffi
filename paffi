@@ -36,8 +36,6 @@ STARTING_CHAR = '.'
 TARGET_CHAR = 'x'
 PATH_CHAR = '@'
 
-Point = namedtuple('point', ['row', 'col'])
-
 
 def parse_options(options_list):
     global STARTING_CHAR
@@ -58,6 +56,9 @@ def parse_options(options_list):
             TARGET_CHAR = option_value
         elif option_type == '-p':
             PATH_CHAR = option_value
+
+
+Point = namedtuple('point', ['row', 'col'])
 
 
 class World:

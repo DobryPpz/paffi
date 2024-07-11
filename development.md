@@ -1,2 +1,8 @@
-- Add the export feature, where there the paths, and only the paths will be printed into some results file.
+- Add the export feature, where the paths, and only the paths will be printed into some results file.
+- Add the export feature, where both the original file content and the paths will be printed into some results file.
 - Add the option to specify neighbourhood type, where it's either Moore or Von Neumann.
+- Paths are highlighted in some way, for example by some color.
+- Instead of a path character, the user can specify a string, where the path will be composed of that string's content.
+- Provide the possibility to merge several files into one, so that the path search can be performed on such merged file.
+- Provide the animation feature where the paths are drawn in animated way.
+- The paths are drawn according to some schema provided by the user, where we will provide a simple domain language for defining path behavior.
