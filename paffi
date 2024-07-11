@@ -61,13 +61,52 @@ def parse_options(options_list):
 Point = namedtuple('point', ['row', 'col'])
 
 
+def go_up(point: Point):
+    return Point(point.row-1, point.col)
+
+
+def go_up_right(point: Point):
+    return Point(point.row-1, point.col+1)
+
+
+def go_right(point: Point):
+    return Point(point.row, point.col+1)
+
+
+def go_down_right(point: Point):
+    return Point(point.row+1, point.col+1)
+
+
+def go_down(point: Point):
+    return Point(point.row+1, point.col)
+
+
+def go_down_left(point: Point):
+    return Point(point.row+1, point.col-1)
+
+
+def go_left(point: Point):
+    return Point(point.row, point.col-1)
+
+
+def go_up_left(point: Point):
+    return Point(point.row-1, point.col-1)
+
+
 class World:
-    def __init__(self) -> None:
+    def __init__(self, extended_neighbourhood=False) -> None:
         self.field = []
         self.starting_points = []
         self.paths = []
         self.prevs = {}
         self.can_to = set([STARTING_CHAR, TARGET_CHAR, ' '])
+        self.extended_neighbourhood = extended_neighbourhood
+        self.possible_directions = [go_up, go_right,
+                                    go_down, go_left] + ([
+                                        go_up_right,
+                                        go_up_left,
+                                        go_down_right,
+                                        go_down_left] if self.extended_neighbourhood else [])
 
     def add_row(self, row: str):
         row = row.strip('\n')
@@ -75,6 +114,17 @@ class World:
             self.field.append(row)
         else:
             self.field.append(' ')
+
+    def is_point_valid(self, point: Point):
+        row = point.row
+        col = point.col
+        if row < 0 or row >= len(self.field):
+            return False
+        if col < 0 or col >= len(self.field[row]):
+            return False
+        if self.field[row][col] not in self.can_to:
+            return False
+        return True
 
     def do_padding(self):
         longest_line_len = 1
