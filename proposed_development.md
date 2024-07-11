@@ -6,3 +6,7 @@
 - Provide the possibility to merge several files into one, so that the path search can be performed on such merged file.
 - Provide the animation feature where the paths are drawn in animated way.
 - The paths are drawn according to some schema provided by the user, where we will provide a simple domain language for defining path behavior.
+- Add some minimization features, for example a feature where paffi returns the minimum number of characters that need to be deleted from the original file so that the resulting path is shortest possible.
+- Add the option to specify the maximum path length that paffi can consider.
+- Add a shifter feature: for some path present for some file paffi can shift the whole file in such a way that the path is straightened.
+- 
