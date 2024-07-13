@@ -27,6 +27,7 @@ You can specify the following options:
 -s:<c>  ->  the starting point character will be <c>
 -t:<c>  ->  the target character will be <c>
 -p:<c>  ->  the paths will be drawn with <c> character
+-n:<c>  ->  the neighbourhood: 4 for Von Neumann(default), 8 for Moore
 '''
 
 import sys
@@ -35,13 +36,15 @@ from collections import deque, namedtuple
 STARTING_CHAR = '.'
 TARGET_CHAR = 'x'
 PATH_CHAR = '@'
+EXTENDED_NEIGHBOURHOOD = False
 
 
 def parse_options(options_list):
     global STARTING_CHAR
     global TARGET_CHAR
     global PATH_CHAR
-    option_set = set(['-s', '-t', '-p'])
+    global EXTENDED_NEIGHBOURHOOD
+    option_set = set(['-s', '-t', '-p', '-n'])
     for option in options_list:
         if len(option) != 4:
             print(f'"{option}"  Wrong option format', file=sys.stderr)
@@ -56,18 +59,66 @@ def parse_options(options_list):
             TARGET_CHAR = option_value
         elif option_type == '-p':
             PATH_CHAR = option_value
+        elif option_type == '-n':
+            if option_value != '4' and option_value != '8':
+                print(
+                    f'"{option_value}":  no such neighbourhood available', file=sys.stderr)
+                exit(-1)
+            if option_value == '4':
+                EXTENDED_NEIGHBOURHOOD = False
+            elif option_value == '8':
+                EXTENDED_NEIGHBOURHOOD = True
 
 
 Point = namedtuple('point', ['row', 'col'])
 
 
+def go_up(point: Point):
+    return Point(point.row-1, point.col)
+
+
+def go_up_right(point: Point):
+    return Point(point.row-1, point.col+1)
+
+
+def go_right(point: Point):
+    return Point(point.row, point.col+1)
+
+
+def go_down_right(point: Point):
+    return Point(point.row+1, point.col+1)
+
+
+def go_down(point: Point):
+    return Point(point.row+1, point.col)
+
+
+def go_down_left(point: Point):
+    return Point(point.row+1, point.col-1)
+
+
+def go_left(point: Point):
+    return Point(point.row, point.col-1)
+
+
+def go_up_left(point: Point):
+    return Point(point.row-1, point.col-1)
+
+
 class World:
-    def __init__(self) -> None:
+    def __init__(self, extended_neighbourhood) -> None:
         self.field = []
         self.starting_points = []
         self.paths = []
         self.prevs = {}
         self.can_to = set([STARTING_CHAR, TARGET_CHAR, ' '])
+        self.extended_neighbourhood = extended_neighbourhood
+        self.possible_directions = [go_up, go_right,
+                                    go_down, go_left] + ([
+                                        go_up_right,
+                                        go_up_left,
+                                        go_down_right,
+                                        go_down_left] if self.extended_neighbourhood else [])
 
     def add_row(self, row: str):
         row = row.strip('\n')
@@ -75,6 +126,17 @@ class World:
             self.field.append(row)
         else:
             self.field.append(' ')
+
+    def is_point_valid(self, point: Point):
+        row = point.row
+        col = point.col
+        if row < 0 or row >= len(self.field):
+            return False
+        if col < 0 or col >= len(self.field[row]):
+            return False
+        if self.field[row][col] not in self.can_to:
+            return False
+        return True
 
     def do_padding(self):
         longest_line_len = 1
@@ -93,52 +155,12 @@ class World:
             if '\t' in self.field[r]:
                 self.field[r] = self.field[r].replace('\t', '    ')
 
-    def can_go_up(self, point: Point):
-        row = point.row
-        col = point.col
-        new_point = Point(row-1, col)
-        if new_point.row < 0:
-            return (False, None)
-        destination_char = self.field[new_point.row][new_point.col]
-        if destination_char not in self.can_to:
-            return (False, None)
-        return (True, new_point)
-
-    def can_go_right(self, point: Point):
-        row = point.row
-        col = point.col
-        new_point = Point(row, col+1)
-        current_line = self.field[row]
-        line_len = len(current_line)
-        if new_point.col >= line_len:
-            return (False, None)
-        destination_char = self.field[new_point.row][new_point.col]
-        if destination_char not in self.can_to:
-            return (False, None)
-        return (True, new_point)
-
-    def can_go_down(self, point: Point):
-        row = point.row
-        col = point.col
-        new_point = Point(row+1, col)
-        num_rows = len(self.field)
-        if new_point.row >= num_rows:
-            return (False, None)
-        destination_char = self.field[new_point.row][new_point.col]
-        if destination_char not in self.can_to:
-            return (False, None)
-        return (True, new_point)
-
-    def can_go_left(self, point: Point):
-        row = point.row
-        col = point.col
-        new_point = Point(row, col-1)
-        if new_point.col < 0:
-            return (False, None)
-        destination_char = self.field[new_point.row][new_point.col]
-        if destination_char not in self.can_to:
-            return (False, None)
-        return (True, new_point)
+    def can_go_from(self, point: Point):
+        candidate_destinations = list(
+            map(lambda dir: dir(point), self.possible_directions))
+        possible_destinations = [
+            d for d in candidate_destinations if self.is_point_valid(d)]
+        return possible_destinations
 
     def find_starts(self):
         num_rows = len(self.field)
@@ -175,30 +197,14 @@ class World:
                 current_char = self.field[node.row][node.col]
                 if current_char == TARGET_CHAR:
                     self.add_path(start, node)
+                    continue
 
-                result, new_point = self.can_go_up(node)
-                if result and new_point not in visited:
-                    self.prevs[new_point] = node
-                    visited.add(new_point)
-                    queue.append(new_point)
-
-                result, new_point = self.can_go_right(node)
-                if result and new_point not in visited:
-                    self.prevs[new_point] = node
-                    visited.add(new_point)
-                    queue.append(new_point)
-
-                result, new_point = self.can_go_down(node)
-                if result and new_point not in visited:
-                    self.prevs[new_point] = node
-                    visited.add(new_point)
-                    queue.append(new_point)
-
-                result, new_point = self.can_go_left(node)
-                if result and new_point not in visited:
-                    self.prevs[new_point] = node
-                    visited.add(new_point)
-                    queue.append(new_point)
+                where_now = self.can_go_from(node)
+                for point in where_now:
+                    if point not in visited:
+                        self.prevs[point] = node
+                        visited.add(point)
+                        queue.append(point)
 
     def __str__(self) -> str:
         self.run()
@@ -225,7 +231,7 @@ options_part = sys.argv[1:-1]
 if options_part:
     parse_options(options_part)
 
-world = World()
+world = World(EXTENDED_NEIGHBOURHOOD)
 world.readin(the_file)
 the_file.close()
 print(world)
