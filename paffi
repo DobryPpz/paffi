@@ -44,7 +44,7 @@ def parse_options(options_list):
     global TARGET_CHAR
     global PATH_CHAR
     global EXTENDED_NEIGHBOURHOOD
-    option_set = set(['-s', '-t', '-p'])
+    option_set = set(['-s', '-t', '-p', '-n'])
     for option in options_list:
         if len(option) != 4:
             print(f'"{option}"  Wrong option format', file=sys.stderr)
@@ -59,6 +59,15 @@ def parse_options(options_list):
             TARGET_CHAR = option_value
         elif option_type == '-p':
             PATH_CHAR = option_value
+        elif option_type == '-n':
+            if option_value != '4' and option_value != '8':
+                print(
+                    f'"{option_value}":  no such neighbourhood available', file=sys.stderr)
+                exit(-1)
+            if option_value == '4':
+                EXTENDED_NEIGHBOURHOOD = False
+            elif option_value == '8':
+                EXTENDED_NEIGHBOURHOOD = True
 
 
 Point = namedtuple('point', ['row', 'col'])
