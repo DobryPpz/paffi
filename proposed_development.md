@@ -8,4 +8,3 @@
 - Add some minimization features, for example a feature where paffi returns the minimum number of characters that need to be deleted from the original file so that the resulting path is shortest possible.
 - Add the option to specify the maximum path length that paffi can consider.
 - Add a shifter feature: for some path present for some file paffi can shift the whole file in such a way that the path is straightened.
-- Use argparse.
