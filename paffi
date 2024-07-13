@@ -31,6 +31,7 @@ You can specify the following options:
 '''
 
 import sys
+import argparse
 from collections import deque, namedtuple
 
 STARTING_CHAR = '.'
@@ -39,35 +40,39 @@ PATH_CHAR = '@'
 EXTENDED_NEIGHBOURHOOD = False
 
 
-def parse_options(options_list):
+def validate_starting_char(char):
+    if len(char) != 1:
+        print(f'{char}:  This can\'t be a starting character', file=sys.stderr)
+        exit(-1)
     global STARTING_CHAR
+    STARTING_CHAR = char
+
+
+def validate_target_char(char):
+    if len(char) != 1:
+        print(f'{char}:  This can\'t be a target character', file=sys.stderr)
+        exit(-1)
     global TARGET_CHAR
+    TARGET_CHAR = char
+
+
+def validate_path_char(char):
+    if len(char) != 1:
+        print(f'{char}:  This can\'t be a path character', file=sys.stderr)
+        exit(-1)
     global PATH_CHAR
+    PATH_CHAR = char
+
+
+def validate_neighbourhood(n):
+    if n != '4' and n != '8':
+        print(f'{n}:  No such neighbourhood available', file=sys.stderr)
+        exit(-1)
     global EXTENDED_NEIGHBOURHOOD
-    option_set = set(['-s', '-t', '-p', '-n'])
-    for option in options_list:
-        if len(option) != 4:
-            print(f'"{option}"  Wrong option format', file=sys.stderr)
-            exit(-1)
-        option_type, option_value = option[:2], option[3:]
-        if option_type not in option_set:
-            print(f'"{option_type}"  no such option available', file=sys.stderr)
-            exit(-1)
-        if option_type == '-s':
-            STARTING_CHAR = option_value
-        elif option_type == '-t':
-            TARGET_CHAR = option_value
-        elif option_type == '-p':
-            PATH_CHAR = option_value
-        elif option_type == '-n':
-            if option_value != '4' and option_value != '8':
-                print(
-                    f'"{option_value}":  no such neighbourhood available', file=sys.stderr)
-                exit(-1)
-            if option_value == '4':
-                EXTENDED_NEIGHBOURHOOD = False
-            elif option_value == '8':
-                EXTENDED_NEIGHBOURHOOD = True
+    if n == '4':
+        EXTENDED_NEIGHBOURHOOD = False
+    elif n == '8':
+        EXTENDED_NEIGHBOURHOOD = True
 
 
 Point = namedtuple('point', ['row', 'col'])
@@ -215,21 +220,37 @@ class World:
         return '\n'.join(list(map(lambda line: ''.join(line), lines)))
 
 
-if len(sys.argv) < 2:
-    print('Not enough arguments to paffi', file=sys.stderr)
-    exit(-1)
+parser = argparse.ArgumentParser()
+parser.add_argument('file', help='The file you want to work on')
+parser.add_argument('-s', '--starting',
+                    help='The character you want to be the starting point of the search')
+parser.add_argument('-t', '--target',
+                    help='The character you want to be the target in search')
+parser.add_argument('-p', '--path',
+                    help='The character you want to draw paths with')
+parser.add_argument('-n', '--neighbourhood',
+                    help='The type of neighbourhood of character cells')
 
-file_path = sys.argv[-1]
+
+args = parser.parse_args()
+
+file_path = args.file
 
 try:
     the_file = open(file_path, 'r')
-except OSError:
-    print('Could not open the file', file=sys.stderr)
+except IOError:
+    print('Could not open file', file=sys.stderr)
     exit(-1)
 
-options_part = sys.argv[1:-1]
-if options_part:
-    parse_options(options_part)
+if args.starting:
+    validate_starting_char(args.starting)
+if args.target:
+    validate_target_char(args.target)
+if args.path:
+    validate_path_char(args.path)
+if args.neighbourhood:
+    validate_neighbourhood(args.neighbourhood)
+
 
 world = World(EXTENDED_NEIGHBOURHOOD)
 world.readin(the_file)
