@@ -1,1 +1,0 @@
-- Add the option to specify neighbourhood type, where it's either Moore or Von Neumann.
