@@ -197,6 +197,7 @@ class World:
                 current_char = self.field[node.row][node.col]
                 if current_char == TARGET_CHAR:
                     self.add_path(start, node)
+                    continue
 
                 where_now = self.can_go_from(node)
                 for point in where_now:
