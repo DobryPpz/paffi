@@ -24,10 +24,10 @@ Any other character means obstacle.
 The program will read in such file and draw the shortest paths from starting
 points to targets. The shortest paths will be drawn with @ character(default).
 You can specify the following options:
--s:<c>  ->  the starting point character will be <c>
--t:<c>  ->  the target character will be <c>
--p:<c>  ->  the paths will be drawn with <c> character
--n:<c>  ->  the neighbourhood: 4 for Von Neumann(default), 8 for Moore
+-s <c>  ->  the starting point character will be <c>
+-t <c>  ->  the target character will be <c>
+-p <c>  ->  the paths will be drawn with <c> character
+-n <c>  ->  the neighbourhood: 4 for Von Neumann(default), 8 for Moore
 '''
 
 import sys
