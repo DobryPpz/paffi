@@ -111,19 +111,18 @@ def go_up_left(point: Point):
 
 
 class World:
-    def __init__(self, extended_neighbourhood) -> None:
+    def __init__(self) -> None:
         self.field = []
         self.starting_points = []
         self.paths = []
         self.prevs = {}
         self.can_to = set([STARTING_CHAR, TARGET_CHAR, ' '])
-        self.extended_neighbourhood = extended_neighbourhood
         self.possible_directions = [go_up, go_right,
                                     go_down, go_left] + ([
                                         go_up_right,
                                         go_up_left,
                                         go_down_right,
-                                        go_down_left] if self.extended_neighbourhood else [])
+                                        go_down_left] if EXTENDED_NEIGHBOURHOOD else [])
 
     def add_row(self, row: str):
         row = row.strip('\n')
@@ -252,7 +251,7 @@ if args.neighbourhood:
     validate_neighbourhood(args.neighbourhood)
 
 
-world = World(EXTENDED_NEIGHBOURHOOD)
+world = World()
 world.readin(the_file)
 the_file.close()
 print(world)
