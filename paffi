@@ -29,6 +29,7 @@ You can specify the following options:
 -p <c>  ->  the paths will be drawn with <c> character
 -n <c>  ->  the neighbourhood: 4 for Von Neumann(default), 8 for Moore
 -o <file>  ->  the path to file where you want to store the results
+--maxlen <n>  ->  maximum path lengths to consider
 '''
 
 import sys
