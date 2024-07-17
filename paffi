@@ -39,6 +39,7 @@ STARTING_CHAR = '.'
 TARGET_CHAR = 'x'
 PATH_CHAR = '@'
 EXTENDED_NEIGHBOURHOOD = False
+MAX_PATH_LEN = None
 
 
 def validate_starting_char(char):
@@ -75,6 +76,11 @@ def validate_neighbourhood(n):
     elif n == '8':
         EXTENDED_NEIGHBOURHOOD = True
 
+def validate_path_length(n):
+    if n<=0:
+        print('The path lengths must be at least 1', file=sys.stderr)
+    global MAX_PATH_LEN
+    MAX_PATH_LEN = n
 
 Point = namedtuple('point', ['row', 'col'])
 
@@ -183,8 +189,10 @@ class World:
         while curr_point != src:
             new_path.append(curr_point)
             curr_point = self.prevs[curr_point]
-        del new_path[0]
-        self.paths.append(new_path)
+        if MAX_PATH_LEN is not None:
+            if len(new_path) <= MAX_PATH_LEN:
+                del new_path[0]
+                self.paths.append(new_path)
 
     def readin(self, file):
         for line in file.readlines():
@@ -260,6 +268,8 @@ parser.add_argument('-o', '--output',
                     help='The file you want to write results to')
 parser.add_argument('--just_path', action='store_true',
                     help='Give if you want to save the paths only')
+parser.add_argument('--maxlen', type=int,
+                    help='Maximum path length to consider')
 
 
 args = parser.parse_args()
@@ -280,6 +290,8 @@ if args.path:
     validate_path_char(args.path)
 if args.neighbourhood:
     validate_neighbourhood(args.neighbourhood)
+if args.maxlen:
+    validate_path_length(args.maxlen)
 
 
 world = World()
