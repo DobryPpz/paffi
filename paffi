@@ -212,6 +212,8 @@ class World:
                         self.prevs[point] = node
                         visited.add(point)
                         queue.append(point)
+        if len(self.paths) == 0:
+            print('No paths were found.', file=sys.stderr)
         self.calculated = True
 
     def __str__(self) -> str:
