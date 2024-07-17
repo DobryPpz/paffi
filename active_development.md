@@ -1,0 +1,1 @@
+- Add the option to specify the maximum path length that paffi can consider.
