@@ -28,6 +28,7 @@ You can specify the following options:
 -t <c>  ->  the target character will be <c>
 -p <c>  ->  the paths will be drawn with <c> character
 -n <c>  ->  the neighbourhood: 4 for Von Neumann(default), 8 for Moore
+-o <file>  ->  the path to file where you want to store the results
 '''
 
 import sys
@@ -116,6 +117,8 @@ class World:
         self.starting_points = []
         self.paths = []
         self.prevs = {}
+        self.calculated = False
+        self.product = None
         self.can_to = set([STARTING_CHAR, TARGET_CHAR, ' '])
         self.possible_directions = [go_up, go_right,
                                     go_down, go_left] + ([
@@ -209,14 +212,34 @@ class World:
                         self.prevs[point] = node
                         visited.add(point)
                         queue.append(point)
+        self.calculated = True
 
     def __str__(self) -> str:
-        self.run()
+        if self.calculated == False:
+            self.run()
         lines = list(map(lambda l: list(l), self.field))
         for path in self.paths:
             for point in path:
                 lines[point.row][point.col] = PATH_CHAR
-        return '\n'.join(list(map(lambda line: ''.join(line), lines)))
+        self.product = '\n'.join(list(map(lambda line: ''.join(line), lines)))
+        return self.product
+
+    def output_full(self, file):
+        if self.calculated == False:
+            self.run()
+        if self.product is None:
+            self.__str__()
+        print(self.product, file=file)
+
+    def output_path_only(self, file):
+        linelen = len(self.field[0])
+        lines = []
+        for i in range(len(self.field)):
+            lines.append(list(' '*linelen))
+        for path in self.paths:
+            for point in path:
+                lines[point.row][point.col] = PATH_CHAR
+        print('\n'.join(list(map(lambda line: ''.join(line), lines))), file=file)
 
 
 parser = argparse.ArgumentParser()
@@ -229,6 +252,10 @@ parser.add_argument('-p', '--path',
                     help='The character you want to draw paths with')
 parser.add_argument('-n', '--neighbourhood',
                     help='The type of neighbourhood of character cells')
+parser.add_argument('-o', '--output',
+                    help='The file you want to write results to')
+parser.add_argument('--just_path', action='store_true',
+                    help='Give if want to save the paths only')
 
 
 args = parser.parse_args()
@@ -255,3 +282,15 @@ world = World()
 world.readin(the_file)
 the_file.close()
 print(world)
+
+if args.output:
+    try:
+        the_file = open(args.output, 'w')
+    except IOError:
+        print('Could not open file', file=sys.stderr)
+        exit(-1)
+    if args.just_path:
+        world.output_path_only(the_file)
+    else:
+        world.output_full(the_file)
+    the_file.close
