@@ -77,11 +77,13 @@ def validate_neighbourhood(n):
     elif n == '8':
         EXTENDED_NEIGHBOURHOOD = True
 
+
 def validate_path_length(n):
-    if n<=0:
+    if n <= 0:
         print('The path lengths must be at least 1', file=sys.stderr)
     global MAX_PATH_LEN
     MAX_PATH_LEN = n
+
 
 Point = namedtuple('point', ['row', 'col'])
 
