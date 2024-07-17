@@ -232,6 +232,8 @@ class World:
         print(self.product, file=file)
 
     def output_path_only(self, file):
+        if self.calculated == False:
+            self.run()
         linelen = len(self.field[0])
         lines = []
         for i in range(len(self.field)):
