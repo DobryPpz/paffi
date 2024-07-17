@@ -1,4 +1,3 @@
-- Paths are highlighted in some way, for example by some color.
 - Instead of a path character, the user can specify a string, where the path will be composed of that string's content.
 - Provide the possibility to merge several files into one, so that the path search can be performed on such merged file.
 - Provide the animation feature where the paths are drawn in animated way.
