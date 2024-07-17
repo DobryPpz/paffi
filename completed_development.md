@@ -3,3 +3,4 @@
 - Add the export feature, where the paths, and only the paths will be printed into some results file.
 - Add the export feature, where both the original file content and the paths will be printed into some results file.
 - Add the option to specify the maximum path length that paffi can consider.
+- Paths are highlighted in some way, for example by some color.

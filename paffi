@@ -30,6 +30,7 @@ You can specify the following options:
 -n <c>  ->  the neighbourhood: 4 for Von Neumann(default), 8 for Moore
 -o <file>  ->  the path to file where you want to store the results
 --maxlen <n>  ->  maximum path lengths to consider
+--highlight  ->  the paths will be highlighted
 '''
 
 import sys
@@ -41,6 +42,7 @@ TARGET_CHAR = 'x'
 PATH_CHAR = '@'
 EXTENDED_NEIGHBOURHOOD = False
 MAX_PATH_LEN = None
+HIGHLIGHT = False
 
 
 def validate_starting_char(char):
@@ -77,11 +79,13 @@ def validate_neighbourhood(n):
     elif n == '8':
         EXTENDED_NEIGHBOURHOOD = True
 
+
 def validate_path_length(n):
-    if n<=0:
+    if n <= 0:
         print('The path lengths must be at least 1', file=sys.stderr)
     global MAX_PATH_LEN
     MAX_PATH_LEN = n
+
 
 Point = namedtuple('point', ['row', 'col'])
 
@@ -190,10 +194,11 @@ class World:
         while curr_point != src:
             new_path.append(curr_point)
             curr_point = self.prevs[curr_point]
-        if MAX_PATH_LEN is not None:
-            if len(new_path) <= MAX_PATH_LEN:
-                del new_path[0]
-                self.paths.append(new_path)
+        if MAX_PATH_LEN is not None and len(new_path) > MAX_PATH_LEN:
+            return
+        else:
+            del new_path[0]
+            self.paths.append(new_path)
 
     def readin(self, file):
         for line in file.readlines():
@@ -231,7 +236,10 @@ class World:
         lines = list(map(lambda l: list(l), self.field))
         for path in self.paths:
             for point in path:
-                lines[point.row][point.col] = PATH_CHAR
+                if HIGHLIGHT == True:
+                    lines[point.row][point.col] = f'\033[0;32m{PATH_CHAR}\033[0m'
+                else:
+                    lines[point.row][point.col] = PATH_CHAR
         self.product = '\n'.join(list(map(lambda line: ''.join(line), lines)))
         return self.product
 
@@ -271,6 +279,8 @@ parser.add_argument('--just_path', action='store_true',
                     help='Give if you want to save the paths only')
 parser.add_argument('--maxlen', type=int,
                     help='Maximum path length to consider')
+parser.add_argument('--highlight', action='store_true',
+                    help='Give if you want to highlight paths when printing')
 
 
 args = parser.parse_args()
@@ -293,6 +303,8 @@ if args.neighbourhood:
     validate_neighbourhood(args.neighbourhood)
 if args.maxlen:
     validate_path_length(args.maxlen)
+if args.highlight:
+    HIGHLIGHT = True
 
 
 world = World()
