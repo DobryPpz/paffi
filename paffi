@@ -257,7 +257,7 @@ parser.add_argument('-n', '--neighbourhood',
 parser.add_argument('-o', '--output',
                     help='The file you want to write results to')
 parser.add_argument('--just_path', action='store_true',
-                    help='Give if want to save the paths only')
+                    help='Give if you want to save the paths only')
 
 
 args = parser.parse_args()
