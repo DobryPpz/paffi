@@ -190,10 +190,11 @@ class World:
         while curr_point != src:
             new_path.append(curr_point)
             curr_point = self.prevs[curr_point]
-        if MAX_PATH_LEN is not None:
-            if len(new_path) <= MAX_PATH_LEN:
-                del new_path[0]
-                self.paths.append(new_path)
+        if MAX_PATH_LEN is not None and len(new_path) > MAX_PATH_LEN:
+            return
+        else:
+            del new_path[0]
+            self.paths.append(new_path)
 
     def readin(self, file):
         for line in file.readlines():
