@@ -289,7 +289,7 @@ class World:
         linelen = len(self.field[0])
         lines = []
         for _ in range(len(self.field)):
-            lines.append(list(' '*linelen))
+            lines.append([' ']*linelen)
         for path in self.paths:
             for point in path:
                 lines[point.row][point.col] = PATH_CHAR
