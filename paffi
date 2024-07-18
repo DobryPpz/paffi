@@ -194,11 +194,8 @@ class World:
         while curr_point != src:
             new_path.append(curr_point)
             curr_point = self.prevs[curr_point]
-        if MAX_PATH_LEN is not None and len(new_path) > MAX_PATH_LEN:
-            return
-        else:
-            del new_path[0]
-            self.paths.append(new_path)
+        del new_path[0]
+        self.paths.append(new_path)
 
     def readin(self, file):
         for line in file.readlines():
@@ -212,12 +209,15 @@ class World:
             start = self.starting_points.pop()
             self.prevs.clear()
             visited = set([start])
-            queue = deque([start])
+            queue = deque([(start, 0)])
             while queue:
-                node = queue.popleft()
+                node, traveled = queue.popleft()
                 current_char = self.field[node.row][node.col]
                 if current_char == TARGET_CHAR:
                     self.add_path(start, node)
+                    continue
+
+                if MAX_PATH_LEN is not None and traveled == MAX_PATH_LEN:
                     continue
 
                 where_now = self.can_go_from(node)
@@ -225,7 +225,7 @@ class World:
                     if point not in visited:
                         self.prevs[point] = node
                         visited.add(point)
-                        queue.append(point)
+                        queue.append((point, traveled+1))
         if len(self.paths) == 0:
             print('No paths were found.', file=sys.stderr)
         self.calculated = True
