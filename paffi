@@ -31,11 +31,34 @@ You can specify the following options:
 -o <file>  ->  the path to file where you want to store the results
 --maxlen <n>  ->  maximum path lengths to consider
 --highlight  ->  the paths will be highlighted
+-c <color>  ->  choose the color for highlighting
 '''
 
 import sys
 import argparse
 from collections import deque, namedtuple
+
+# SGR color constants
+# rene-d 2018
+colors = {
+    'black': '\033[0;30m',
+    'red': '\033[0;31m',
+    'green': '\033[0;32m',
+    'brown': '\033[0;33m',
+    'blue': '\033[0;34m',
+    'purple': '\033[0;35m',
+    'cyan': '\033[0;36m',
+    'light_gray': '\033[0;37m',
+    'dark_gray': '\033[1;30m',
+    'light_red': '\033[1;31m',
+    'light_green': '\033[1;32m',
+    'yellow': '\033[1;33m',
+    'light_blue': '\033[1;34m',
+    'light_purple': '\033[1;35m',
+    'light_cyan': '\033[1;36m',
+    'white': '\033[1;37m'
+}
+
 
 STARTING_CHAR = '.'
 TARGET_CHAR = 'x'
@@ -43,6 +66,7 @@ PATH_CHAR = '@'
 EXTENDED_NEIGHBOURHOOD = False
 MAX_PATH_LEN = None
 HIGHLIGHT = False
+CURRENT_COLOR = colors['red']
 
 
 def validate_starting_char(char):
@@ -81,10 +105,18 @@ def validate_neighbourhood(n):
 
 
 def validate_path_length(n):
-    if n <= 0:
+    if n < 1:
         print('The path lengths must be at least 1', file=sys.stderr)
     global MAX_PATH_LEN
     MAX_PATH_LEN = n
+
+
+def validate_color_name(name):
+    if name not in colors:
+        print('There\'s no such color', file=sys.stderr)
+        exit(-1)
+    global CURRENT_COLOR
+    CURRENT_COLOR = colors[name]
 
 
 Point = namedtuple('point', ['row', 'col'])
@@ -237,7 +269,7 @@ class World:
         for path in self.paths:
             for point in path:
                 if HIGHLIGHT == True:
-                    lines[point.row][point.col] = f'\033[0;32m{PATH_CHAR}\033[0m'
+                    lines[point.row][point.col] = f'{CURRENT_COLOR}{PATH_CHAR}\033[0m'
                 else:
                     lines[point.row][point.col] = PATH_CHAR
         self.product = '\n'.join(list(map(lambda line: ''.join(line), lines)))
@@ -281,6 +313,8 @@ parser.add_argument('--maxlen', type=int,
                     help='Maximum path length to consider')
 parser.add_argument('--highlight', action='store_true',
                     help='Give if you want to highlight paths when printing')
+parser.add_argument('-c', '--color',
+                    help='The color you want to use for highlighting paths')
 
 
 args = parser.parse_args()
@@ -305,6 +339,8 @@ if args.maxlen:
     validate_path_length(args.maxlen)
 if args.highlight:
     HIGHLIGHT = True
+if args.color and args.highlight:
+    validate_color_name(args.color)
 
 
 world = World()
