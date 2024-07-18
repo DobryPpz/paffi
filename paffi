@@ -295,68 +295,70 @@ class World:
                 lines[point.row][point.col] = PATH_CHAR
         print('\n'.join(list(map(lambda line: ''.join(line), lines))), file=file)
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument('file', help='The file you want to work on')
-parser.add_argument('-s', '--starting',
-                    help='The character you want to be the starting point of the search')
-parser.add_argument('-t', '--target',
-                    help='The character you want to be the target in search')
-parser.add_argument('-p', '--path',
-                    help='The character you want to draw paths with')
-parser.add_argument('-n', '--neighbourhood',
-                    help='The type of neighbourhood of character cells')
-parser.add_argument('-o', '--output',
-                    help='The file you want to write results to')
-parser.add_argument('--just_path', action='store_true',
-                    help='Give if you want to save the paths only')
-parser.add_argument('--maxlen', type=int,
-                    help='Maximum path length to consider')
-parser.add_argument('--highlight', action='store_true',
-                    help='Give if you want to highlight paths when printing')
-parser.add_argument('-c', '--color',
-                    help='The color you want to use for highlighting paths')
-
-
-args = parser.parse_args()
-
-file_path = args.file
-
-try:
-    the_file = open(file_path, 'r')
-except IOError:
-    print('Could not open file', file=sys.stderr)
-    exit(-1)
-
-if args.starting:
-    validate_starting_char(args.starting)
-if args.target:
-    validate_target_char(args.target)
-if args.path:
-    validate_path_char(args.path)
-if args.neighbourhood:
-    validate_neighbourhood(args.neighbourhood)
-if args.maxlen:
-    validate_path_length(args.maxlen)
-if args.highlight:
-    HIGHLIGHT = True
-if args.color and args.highlight:
-    validate_color_name(args.color)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file', help='The file you want to work on')
+    parser.add_argument('-s', '--starting',
+                        help='The character you want to be the starting point of the search')
+    parser.add_argument('-t', '--target',
+                        help='The character you want to be the target in search')
+    parser.add_argument('-p', '--path',
+                        help='The character you want to draw paths with')
+    parser.add_argument('-n', '--neighbourhood',
+                        help='The type of neighbourhood of character cells')
+    parser.add_argument('-o', '--output',
+                        help='The file you want to write results to')
+    parser.add_argument('--just_path', action='store_true',
+                        help='Give if you want to save the paths only')
+    parser.add_argument('--maxlen', type=int,
+                        help='Maximum path length to consider')
+    parser.add_argument('--highlight', action='store_true',
+                        help='Give if you want to highlight paths when printing')
+    parser.add_argument('-c', '--color',
+                        help='The color you want to use for highlighting paths')
 
 
-world = World()
-world.readin(the_file)
-the_file.close()
-print(world)
+    args = parser.parse_args()
 
-if args.output:
+    file_path = args.file
+
     try:
-        the_file = open(args.output, 'w')
+        the_file = open(file_path, 'r')
     except IOError:
         print('Could not open file', file=sys.stderr)
         exit(-1)
-    if args.just_path:
-        world.output_path_only(the_file)
-    else:
-        world.output_full(the_file)
-    the_file.close
+
+    if args.starting:
+        validate_starting_char(args.starting)
+    if args.target:
+        validate_target_char(args.target)
+    if args.path:
+        validate_path_char(args.path)
+    if args.neighbourhood:
+        validate_neighbourhood(args.neighbourhood)
+    if args.maxlen:
+        validate_path_length(args.maxlen)
+    if args.highlight:
+        HIGHLIGHT = True
+    if args.color and args.highlight:
+        validate_color_name(args.color)
+
+
+    world = World()
+    world.readin(the_file)
+    the_file.close()
+    print(world)
+
+    if args.output:
+        try:
+            the_file = open(args.output, 'w')
+        except IOError:
+            print('Could not open file', file=sys.stderr)
+            exit(-1)
+        if args.just_path:
+            world.output_path_only(the_file)
+        else:
+            world.output_full(the_file)
+        the_file.close
+
+
