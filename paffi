@@ -287,7 +287,7 @@ class World:
             self.run()
         linelen = len(self.field[0])
         lines = []
-        for i in range(len(self.field)):
+        for _ in range(len(self.field)):
             lines.append(list(' '*linelen))
         for path in self.paths:
             for point in path:
