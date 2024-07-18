@@ -113,7 +113,7 @@ def validate_path_length(n):
 
 def validate_color_name(name):
     if name not in colors:
-        print('There\'s no such color', file=sys.stderr)
+        print(f'{name}:  There\'s no such color', file=sys.stderr)
         exit(-1)
     global CURRENT_COLOR
     CURRENT_COLOR = colors[name]
