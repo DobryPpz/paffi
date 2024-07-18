@@ -107,6 +107,7 @@ def validate_neighbourhood(n):
 def validate_path_length(n):
     if n < 1:
         print('The path lengths must be at least 1', file=sys.stderr)
+        exit(-1)
     global MAX_PATH_LEN
     MAX_PATH_LEN = n
 
