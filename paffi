@@ -295,6 +295,7 @@ class World:
                 lines[point.row][point.col] = PATH_CHAR
         print('\n'.join(list(map(lambda line: ''.join(line), lines))), file=file)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('file', help='The file you want to work on')
@@ -316,7 +317,6 @@ if __name__ == '__main__':
                         help='Give if you want to highlight paths when printing')
     parser.add_argument('-c', '--color',
                         help='The color you want to use for highlighting paths')
-
 
     args = parser.parse_args()
 
@@ -343,7 +343,6 @@ if __name__ == '__main__':
     if args.color and args.highlight:
         validate_color_name(args.color)
 
-
     world = World()
     world.readin(the_file)
     the_file.close()
@@ -360,5 +359,3 @@ if __name__ == '__main__':
         else:
             world.output_full(the_file)
         the_file.close
-
-
